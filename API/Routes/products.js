@@ -19,10 +19,10 @@ router.get('/', (req, res, next) => {
                 _id: doc._id,
                 request: {
                     type: 'GET',
-                    url: 'http://localhost:3000/'
+                    url: 'http://localhost:3000/products' + doc._id
                 }
             }
-        });
+        })
     };
     //if (docs.length >= 0) {
         res.status(200).json(response);
