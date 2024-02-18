@@ -9,7 +9,7 @@ router.get('/', (req, res, next) => {
    Product.find()
    .exec()
    .then(docs => {
-    console.log(docs);
+    // console.log(docs);
     //if (docs.length >= 0) {
         res.status(200).json(docs);
     //} else {
@@ -35,7 +35,7 @@ router.post('/', (req, res, next) => {
         price: req.body.price
     });
     product.save().then(result => {
-        console.log(result);
+     //   console.log(result);
         res.status(201).json({
             message: 'Handling POST requests to /products',
             createdProduct: result
@@ -54,7 +54,7 @@ router.get('/:productId', (req, res, next) => {
     Product.findById(id)
     .exec()
     .then(doc => {
-        console.log("From database", doc);
+     //   console.log("From database", doc);
         if (doc) {
             res.status(200).json(doc);
         } else {
@@ -72,13 +72,13 @@ router.get('/:productId', (req, res, next) => {
 });
 
 router.patch('/:productId', (req, res, next) => {
-    const id = req.params.productId;
+    const id = req.params.productId.split('=')[1];
 
     const updateOps = {};
-    for (const ops of req.body) {
-        updateOps[ops.propName] = ops.value;
+    for (const propName of Object.keys(req.body)) {
+        updateOps[propName] = req.body[propName];
     }
-    Product.update({_id: id}, { $set: updateOps })
+    Product.updateOne({_id: id}, { $set: updateOps })
     .exec()
     .then(result => {
         console.log(result)
@@ -91,6 +91,8 @@ router.patch('/:productId', (req, res, next) => {
         });
     });
 });
+
+
 
 router.delete('/:productId', (req, res, next) => {
     const id = req.params.productId;
