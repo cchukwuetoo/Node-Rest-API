@@ -7,11 +7,25 @@ const Product = require('../models/product');
 
 router.get('/', (req, res, next) => {
    Product.find()
+   .select('name price _id')
    .exec()
    .then(docs => {
-    // console.log(docs);
+    const response = {
+        count: docs.length,
+        products: docs.map(doc => {
+            return {
+                name: doc.name,
+                price: doc.price,
+                _id: doc._id,
+                request: {
+                    type: 'GET',
+                    url: 'http://localhost:3000/'
+                }
+            }
+        });
+    };
     //if (docs.length >= 0) {
-        res.status(200).json(docs);
+        res.status(200).json(response);
     //} else {
        // res.status(404).json({
            // message: 'No entries found!'
@@ -72,11 +86,11 @@ router.get('/:productId', (req, res, next) => {
 });
 
 router.patch('/:productId', (req, res, next) => {
-    const id = req.params.productId.split('=')[1];
+    const id = req.params.productId
 
     const updateOps = {};
-    for (const propName of Object.keys(req.body)) {
-        updateOps[propName] = req.body[propName];
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
     }
     Product.updateOne({_id: id}, { $set: updateOps })
     .exec()
